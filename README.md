@@ -7,4 +7,5 @@
    - Windows: `venv\Scripts\activate` 
    - macOS/Linux: `source venv/bin/activate` 
 5. Install dependencies: `pip install -r requirements.txt` 
-6. Run the project: `python main.py` 
+6. Download the dataset from [Kaggle](https://www.kaggle.com/datasets/ahmedsaeedali/asl-alphabet-dataset) and extract `asl_alphabet_train` and `asl_alphabet_test` into the project directory.
+7. Run the project: `python main.py`
