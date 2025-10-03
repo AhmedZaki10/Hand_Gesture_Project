@@ -1,0 +1,4 @@
+body { font-family: Arial, sans-serif; display:flex; justify-content:center; padding:20px; }
+#app { max-width:720px; width:100%; text-align:center; }
+canvas { display:block; margin: 10px auto; }
+#prediction { margin-top:8px; font-size:18px; font-weight:bold; }

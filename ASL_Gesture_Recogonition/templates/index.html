@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ASL Gesture Recognition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin-top: 30px;
+            background-color: #f5f5f5;
+        }
+        #video {
+            border: 2px solid #333;
+            border-radius: 10px;
+        }
+        .predictions {
+            margin-top: 20px;
+        }
+        .prediction {
+            font-size: 20px;
+            margin: 5px 0;
+        }
+        .top1 {
+            font-weight: bold;
+            color: #2c7be5;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ASL Gesture Recognition</h1>
+    <video id="video" width="400" height="300" autoplay></video>
+
+    <div class="predictions">
+        <h2>Predictions</h2>
+        <div id="prediction-list"></div>
+    </div>
+
+    <script>
+        const video = document.getElementById("video");
+        const predictionList = document.getElementById("prediction-list");
+        const socket = io();
+
+        // Access webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+
+                setInterval(() => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL("image/jpeg");
+                    socket.emit("frame", dataUrl);
+                }, 300); // send frame every 300ms
+            })
+            .catch(err => {
+                console.error("Error accessing webcam:", err);
+            });
+
+        // Listen for predictions
+        socket.on("prediction", (data) => {
+            if (data.error) {
+                predictionList.innerHTML = `<div style="color:red">${data.error}</div>`;
+                return;
+            }
+
+            if (data.top_predictions) {
+                predictionList.innerHTML = ""; // clear old
+
+                data.top_predictions.forEach((p, idx) => {
+                    const div = document.createElement("div");
+                    div.classList.add("prediction");
+                    if (idx === 0) div.classList.add("top1");
+
+                    const percent = (p.confidence * 100).toFixed(1);
+                    div.innerText = `${idx+1}. ${p.label} — ${percent}%`;
+                    predictionList.appendChild(div);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
